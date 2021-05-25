@@ -16,7 +16,8 @@ for i in range(100):
 
 class run_tracker:
     def __init__(self, images, PATH_TXT, PATH_OUTPUT, PATH_IMG, path_file_test, TRACK_TYPE, n,  MOT_TEST=False,
-                 Track_without_det=False, GUI=True):
+                 Track_without_det=False, GUI=True, wt_path='model_data/model600.pt', iou_threshold=0.8, n_init=3, max_age=10,
+                          max_cosine_distance=0.5, sigma_l=0, sigma_h=0.9):
         self.PATH_TXT = PATH_TXT
         self.PATH_OUTPUT = PATH_OUTPUT
         self.PATH_IMG = PATH_IMG
@@ -27,13 +28,20 @@ class run_tracker:
         self.images = images
         self.GUI = GUI
         self.n = n
+        self.iou_threshold = iou_threshold
+        self.n_init = n_init
+        self.max_age = max_age
+        self.max_cosine_distance = max_cosine_distance
+        self.sigma_l = sigma_l
+        self.sigma_h = sigma_h
+        self.wt_path = wt_path
 
     def TRACKING(self):
         if self.TRACK_TYPE == 'SORT':
             PATH_FILE = read_file(self.PATH_TXT, self.images, self.TRACK_TYPE)
             total_frames = 0
             for seq_dets_fn in glob.glob(PATH_FILE):
-                mot_tracker = Sort(Track_without_det=self.Track_without_det, images=self.images)
+                mot_tracker = Sort(max_age=self.max_age, min_hits=self.n_init, iou_threshold=self.iou_threshold, Track_without_det=self.Track_without_det, images=self.images)
                 seq_dets = np.loadtxt(seq_dets_fn, delimiter=' ')
             start_time = time()
             fps_imutils = imutils.video.FPS().start()
@@ -65,14 +73,14 @@ class run_tracker:
                 show_result(self.images, self.PATH_OUTPUT)
 
         elif self.TRACK_TYPE == 'DEEP_SORT':
-            max_cosine_distance = 0.5
             nn_budget = None
             PATHFILE = read_file(self.PATH_TXT, self.images, self.TRACK_TYPE)
             for seq_dets_fn in glob.glob(PATHFILE):
                 seq_dets = np.loadtxt(seq_dets_fn, delimiter=' ')
-            deepsort = deepsort_rbc(max_cosine_distance=max_cosine_distance, wt_path='model_data/model600.pt')
-            metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
-            tracker = Tracker(metric)
+            deepsort = deepsort_rbc(max_cosine_distance=self.max_cosine_distance, wt_path=self.wt_path)
+            metric = nn_matching.NearestNeighborDistanceMetric("cosine", self.max_cosine_distance, nn_budget)
+            tracker = Tracker(metric, max_iou_distance=self.iou_threshold, max_age=self.max_age,
+                              n_init=self.n_init)
             fps_imutils = imutils.video.FPS().start()
             count_frame = 0
             result = []
@@ -112,16 +120,14 @@ class run_tracker:
 
         elif self.TRACK_TYPE == 'IOU':
             dets = read_file(self.PATH_TXT, self.images, self.TRACK_TYPE)
-            sigma_l = 0
-            sigma_h = 1
-            sigma_iou = 0.5
             t_min = 0
             tracks = []
-            tracker = IOUTracker(sigma_l=sigma_l, sigma_h=sigma_h, sigma_iou=sigma_iou)
+            tracker = IOUTracker(sigma_l=self.sigma_l, sigma_h=self.sigma_h, sigma_iou=self.iou_threshold)
             fps_imutils = imutils.video.FPS().start()
             names = []
             for frame in range(len(self.images)):
-                track = get_track(tracker, self.images[frame], dets[frame], sigma_l, sigma_h, sigma_iou, t_min)
+                track = get_track(tracker, self.images[frame], dets[frame], self.sigma_l, self.sigma_h,
+                                  self.iou_threshold, t_min)
                 tracks.append(track)
                 names.append(frame)
                 fps_imutils.update()

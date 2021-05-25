@@ -1,3 +1,11 @@
+# ---------------------------------------------------------
+# IOU Tracker
+# Copyright (c) 2017 TU Berlin, Communication Systems Group
+# Licensed under The MIT License [see LICENSE for details]
+# Written by Erik Bochinski
+# ---------------------------------------------------------
+
+
 def iou(bbox1, bbox2):
     """
     Calculates the intersection-over-union of two bounding boxes.

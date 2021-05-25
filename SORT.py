@@ -17,8 +17,6 @@ model = torch.load(path_model, map_location=torch.device('cpu'))
 model.eval()
 
 
-
-
 def predict_img(img,model_ft):
     input_size = 224
     fig = plt.figure()
@@ -40,7 +38,6 @@ def predict_img(img,model_ft):
     # fig.set_title('predicted: {}'.format(class_names[preds[j]]))
     # imshow(t.cpu())
     return preds
-
 
 
 def linear_assignment(cost_matrix):
