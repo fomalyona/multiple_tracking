@@ -9,9 +9,6 @@ from MOT_test import *
 from deepsort import *
 from helper import *
 
-colors_list = []
-for i in range(100):
-    colors_list.append((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
 
 
 class run_tracker:
@@ -35,8 +32,12 @@ class run_tracker:
         self.sigma_l = sigma_l
         self.sigma_h = sigma_h
         self.wt_path = wt_path
+        self.colors_list = []
 
     def TRACKING(self):
+        for i in range(300):
+            self.colors_list.append((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+        print(len( self.colors_list))
         if self.TRACK_TYPE == 'SORT':
             PATH_FILE = read_file(self.PATH_TXT, self.images, self.TRACK_TYPE)
             total_frames = 0
@@ -57,7 +58,8 @@ class run_tracker:
                 for d in trackers:
                     # print('%d,%d,%.2f,%.2f,%.2f,%.2f' % (frame, d[4], d[0], d[1], d[2], d[3]))
                     d = d.astype(np.int32)
-                    cv.rectangle(self.images[frame - 1], (d[0], d[1]), (d[2], d[3]), colors_list[d[4]], 2)
+                    print(d[4])
+                    cv.rectangle(self.images[frame - 1], (d[0], d[1]), (d[2], d[3]), self.colors_list[d[4]], 2)
                     cv.putText(self.images[frame - 1], str(d[4]), (int(round((d[0] + d[2]) / 2)), int(round((d[1] + d[3]) / 2))),
                                1, 2, (0, 0, 0), 2)
                     result[frame - 1]['{}'.format(d[4])] = [d[0], d[1], d[2], d[3]]
@@ -101,7 +103,7 @@ class run_tracker:
                     id_num = str(track.track_id)  # Get the ID for the particular track.
                     features = track.features  # Get the feature vector corresponding to the detection.
                     cv2.rectangle(self.images[frame - 1], (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),
-                                  colors_list[track.track_id], 2)
+                                  self.colors_list[track.track_id], 2)
                     cv2.putText(self.images[frame - 1], "ID:" + id_num, (int(round((bbox[0] + bbox[2]) / 2)),
                                                                     int(round((bbox[1] + bbox[3]) / 2))), 1, 2,
                                 (0, 0, 0), 2)

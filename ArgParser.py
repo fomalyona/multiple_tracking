@@ -2,8 +2,8 @@ import configargparse
 
 
 def parse_args():
-    p = configargparse.ArgParser(default_config_files=['config_file.cfg'])
-    p.add_argument('-c', '--config_file', required=True, is_config_file=True, default='config_file.cfg',
+    p = configargparse.ArgParser()
+    p.add_argument('-c', '--config_file', required=False, is_config_file=True, default='config_file.cfg',
                    help='config file path')
     p.add_argument('-t', '--TRACK_TYPE', required=True, help='choose: IOU, SORT, DEEP_SORT')
     p.add_argument('-n', '--name_test', required=False, help='name for MOT test', default=' ')
@@ -21,7 +21,6 @@ def parse_args():
     p.add_argument('-mcd', '--max_cosine_distance', default=0.5, required=False, help='for DeepSort')
     p.add_argument('-sl', '--sigma_l', required=False, default=0, help='for IOU lower detection threshold')
     p.add_argument('-sh', '--sigma_h', required=False, default=0.9, help='for IOU higher detection threshold')
-
     options = p.parse_args()
     print(options)
     print("----------")

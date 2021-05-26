@@ -15,9 +15,10 @@ if __name__ == '__main__':
     PATH_TXT = options.PATH_TXT
     MOT_TEST = options.MOT_TEST
     Track_without_det = options.Track_without_det
-    n = str(options.name_file)
+    n = str(options.name_test)
     logging.info(f'выбран TRACK_TYPE {TRACK_TYPE}')
     images = read_img(PATH_IMG)
+    print(len(images))
     GUI = True  # показывать результаты
     tracker = run_tracker(images, PATH_TXT, PATH_OUTPUT, PATH_IMG, path_file_test, TRACK_TYPE, n,
                           MOT_TEST=MOT_TEST, Track_without_det=Track_without_det, GUI=GUI, wt_path=options.wt_path,
